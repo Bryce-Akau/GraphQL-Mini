@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import List from './List'
 import Header from './header/Header'
 import Tech from './header/Tech'
-import PeopleQuery from './queries/PeopleQuery';
-
+import PeopleQuery from './queries/PeopleQuery'
 
 export default class App extends Component {
   render() {
@@ -24,6 +23,7 @@ export default class App extends Component {
           />
         </Header>
         <PeopleQuery render={data => {
+          console.log('-------------- data2', data);
           return <List list={data.people} />
         }} />
       </div>

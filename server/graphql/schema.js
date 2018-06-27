@@ -1,5 +1,5 @@
 const axios = require ('axios')
-const characters = require('./model')
+let characters = require('./model')
 const {
     GraphQLSchema,
     GraphQLObjectType,
@@ -35,7 +35,7 @@ const Person = new GraphQLObjectType({
             films: {
                 type: GraphQLList(Movie),
                 resolve: (person) => {
-                        person.films.map(film => {
+                        return person.films.map(film => {
                         return axios.get(film).then(res => res.data)
                     })
                 }  
@@ -51,8 +51,37 @@ const Query = new GraphQLObjectType({
         return {
             people:{
                 type: new GraphQLList(Person),
-                resolve: () => {
-                    return characters
+                resolve: () => characters
+            },
+            person: {
+                type: Person,
+                args: {
+                    id: { type: GraphQLNonNull(GraphQLInt) },
+                },
+                resolve:(parentVal, args) => {
+                    // console.log('--------------parentVal', parentVal)
+                    // console.log('--------------args', args)
+                    return characters.find(character => character.id === args.id)
+                } 
+            }
+        }
+    }
+})
+
+const Mutation = new GraphQLObjectType({
+    name: 'mutation',
+    fields: () => {
+        return {
+            deletePerson: {
+                type: Person,
+                args:{ id: { type: GraphQLNonNull(GraphQLInt) } },
+                resolve: (parentVal, args) => {
+                    let character = characters.find(e => e.id === args.id)
+                    characters = characters.filter(person => person.id !== args.id)
+                    return {
+                        id: character.id,
+                        name: character.name
+                    }
                 }
             }
         }
@@ -60,5 +89,6 @@ const Query = new GraphQLObjectType({
 })
 
 module.exports = new GraphQLSchema ({
-    query: Query
+    query: Query,
+    mutation: Mutation
 })

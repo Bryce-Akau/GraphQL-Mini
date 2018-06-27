@@ -8,5 +8,4 @@ const List = props => {
     </div>
   )
 }
-
 export default List
